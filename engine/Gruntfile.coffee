@@ -30,15 +30,39 @@ module.exports = (grunt) ->
         src: ['target/classes/js/tortoise/bootstrap.js'],
         dest: 'target/classes/js/tortoise-engine.js',
         options: {
-          alias: []
+          alias: [],
+          plugin: [
+            "esmify",
+            "wasmify",
+          ],
         }
       }
-    }
+    },
+    run: {
+      # use the `wasm-pack` command to create a package in `node_modules` that
+      # contains the compiled WebAssembly code, which the engine can `require`
+      # as normal
+      build_wasm: {
+        cmd: "npx",
+        args: [
+          "wasm-pack",
+          "build",
+          "--target",
+          "bundler",
+          "--out-dir",
+          "node_modules/tortoise-engine-wasm"
+        ],
+        options: {
+          quiet: Infinity, # prints all output to stderr which we want to ignore
+        },
+      },
+    },
   })
 
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-contrib-copy')
+  grunt.loadNpmTasks('grunt-run')
 
   grunt.task.registerTask('fix_require', 'Changes "require" varname to "tortoise_require"', ->
     filepath    = './target/classes/js/tortoise-engine.js'
@@ -58,4 +82,4 @@ module.exports = (grunt) ->
     return
   )
 
-  grunt.registerTask('default', ['coffee', 'gen_aliases', 'browserify', 'fix_require'])
+  grunt.registerTask('default', ['coffee', 'run:build_wasm', 'gen_aliases', 'browserify', 'fix_require'])

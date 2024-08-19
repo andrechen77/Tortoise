@@ -1,0 +1,5 @@
+{
+	"terminal.integrated.env.linux": {
+		"GRAAL_HOME": "~/.installs/graalvm-community-openjdk-17.0.8+7.1"
+	}
+}

@@ -40,7 +40,7 @@ lazy val grunt = taskKey[Unit]("Runs `grunt` from within SBT")
 grunt := Def.task {
   val targetJS = (Compile / classDirectory).value / "js" / "tortoise-engine.js"
   val log = streams.value.log
-  if (allJSSources.value exists (_.newerThan(targetJS)))
+  if ((allJSSources.value ++ rustSources.value) exists (_.newerThan(targetJS)))
     runNpm(
       log,
       baseDirectory.value,
@@ -49,6 +49,8 @@ grunt := Def.task {
 }.dependsOn(npmInstall).value
 
 watchSources ++= allJSSources.value
+
+watchSources ++= rustSources.value
 
 lazy val packageJson = Def.task[File] {
   baseDirectory.value / "package.json"
@@ -76,6 +78,10 @@ lazy val coffeeSources = Def.task[Seq[File]] {
 
 lazy val scalaJSSources = Def.task[Seq[File]] {
   (baseDirectory.value / "src" / "main" / "scala").listFiles.filter(_.isFile)
+}
+
+lazy val rustSources = Def.task[Seq[File]] {
+  listFilesRecursively(baseDirectory.value / "src" / "main" / "rust")
 }
 
 lazy val gruntSources = Def.task[Seq[File]] {

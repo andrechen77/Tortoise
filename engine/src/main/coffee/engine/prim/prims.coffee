@@ -18,6 +18,8 @@ notImplemented        = require('util/notimplemented')
 
 { EQUALS: EQ, GREATER_THAN: GT, LESS_THAN: LT, } = require('util/comparator')
 
+{ add_one } = require("tortoise-engine-wasm")
+
 getNeighbors  = (patch) -> patch.getNeighbors()
 getNeighbors4 = (patch) -> patch.getNeighbors4()
 lessThan      = (a, b)  -> a < b
@@ -96,7 +98,7 @@ module.exports =
 
     # (Any, Any) => Boolean
     equality: (a, b) ->
-      if a? and b?
+      if a? and b? and (add_one(1) is 2)
         (a is b) or # This code has been purposely rewritten into a crude, optimized form --JAB (3/19/14)
           checks.isBreedSet(b.getSpecialName?(), a) or
           checks.isBreedSet(a.getSpecialName?(), b) or
