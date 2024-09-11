@@ -6,7 +6,10 @@ import Keys._
 def runNpm(log: Logger, runDir: File, args: Seq[String], env: (String, String)*): Unit = {
   val npmArgs = Seq("npm") ++ args
   log.info(npmArgs.mkString(" "))
-  val result = Process(npmArgs, runDir, env:_*).!(log)
+  val result = Process(npmArgs, runDir, env:_*) ! ProcessLogger(
+    out => log.info(out),
+    err => log.info(err),
+  )
   if (result != 0) {
     throw new MessageOnlyException("npm command indicated an unsuccessful result.")
   }
@@ -36,15 +39,15 @@ coffeelint := Def.task {
   )
 }.dependsOn(npmInstall).value
 
-lazy val grunt = taskKey[Unit]("Runs `grunt` from within SBT")
-grunt := Def.task {
+lazy val rollup = taskKey[Unit]("Runs `rollup` from within SBT")
+rollup := Def.task {
   val targetJS = (Compile / classDirectory).value / "js" / "tortoise-engine.js"
   val log = streams.value.log
   if (allJSSources.value exists (_.newerThan(targetJS)))
     runNpm(
       log,
       baseDirectory.value,
-      Seq("exec", "--", "grunt")
+      Seq("exec", "--", "rollup", "-c")
     )
 }.dependsOn(npmInstall).value
 
@@ -76,10 +79,6 @@ lazy val coffeeSources = Def.task[Seq[File]] {
 
 lazy val scalaJSSources = Def.task[Seq[File]] {
   (baseDirectory.value / "src" / "main" / "scala").listFiles.filter(_.isFile)
-}
-
-lazy val gruntSources = Def.task[Seq[File]] {
-  listFilesRecursively((Compile / classDirectory).value / "js")
 }
 
 def listFilesRecursively(f: File): Seq[File] = {

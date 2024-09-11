@@ -1,5 +1,6 @@
 {
   "name": "tortoise",
+  "type": "module",
   "description": "A JavaScript-based implementation of the NetLogo simulation engine",
   "repository": "https://github.com/NetLogo/Tortoise",
   "version": "0.0.1",
@@ -14,10 +15,18 @@
     "vectorious": "=6.0.0-beta.11"
   },
   "devDependencies": {
+    "@bkuri/rollup-plugin-coffeescript": "^0.4.2",
+    "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-wasm": "^6.2.2",
     "coffeelint": "2.1.0",
     "grunt": "1.6.1",
     "grunt-browserify": "6.0.0",
     "grunt-contrib-coffee": "2.1.0",
-    "grunt-contrib-copy": "1.0.0"
+    "grunt-contrib-copy": "1.0.0",
+    "rollup-plugin-includepaths": "^0.2.4",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "wasm-pack": "^0.13.0"
   }
 }

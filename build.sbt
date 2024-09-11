@@ -162,9 +162,6 @@ lazy val netLogoWeb: Project = (project in file("netlogo-web")).
 
     Compile / resourceGenerators += Def.task {
       (engine / Compile / build).value
-      val sourceFile = (engine / Compile / classDirectory).value / "js" / "tortoise" / "shim" / "engine-scala.js"
-      val destFile   = (Compile / classDirectory).value / "engine-scala.js"
-      IO.copyFile(sourceFile, destFile)
       val engineSource = (engine / Compile / classDirectory).value / "js" / "tortoise-engine.js"
       val engineDest   = (Compile / classDirectory).value / "tortoise-engine.js"
       IO.copyFile(engineSource, engineDest)
@@ -181,9 +178,9 @@ lazy val netLogoWeb: Project = (project in file("netlogo-web")).
 
 lazy val build = taskKey[Unit]("Does a full build of the engine Javascript artifact.")
 
-// I want grunt to depend on our custom build task.  This is the easiest way I've found
-// to get that to happen while keeping it's definition in a separate node.sbt file.
-lazy val grunt = taskKey[Unit]("Runs `grunt` from within SBT")
+// Get rollup to depend on scala.js compilation while keeping it's definition in
+// a separate node.sbt file.
+lazy val rollup = taskKey[Unit]("Runs `rollup` from within SBT")
 
 lazy val engine: Project =
   (project in file("engine")).
@@ -192,22 +189,6 @@ lazy val engine: Project =
   settings(
     name := "EngineScalaJS",
     libraryDependencies += "org.nlogo" % "parser-js" % parserJsDependencyVersion cross ScalaJSCrossVersion.binary,
-    build := {
-      val engineFile  = (Compile / fullOptJS / artifactPath).value
-      val destFile    = (Compile / classDirectory).value / "js" / "tortoise" / "shim" / "engine-scala.js"
-      IO.copyFile(engineFile, destFile)
-      val oldContents = IO.read(destFile)
-      val newContents =
-        s"""(function() {
-           |
-           |$oldContents
-           |  module.exports = {
-           |    MersenneTwisterFast: MersenneTwisterFast
-           |  };
-           |
-           |}).call(this);""".stripMargin
-      IO.write(destFile, newContents)
-    },
-    build := build.dependsOn(Compile / fullOptJS).value,
-    build := grunt.dependsOn(build).value
+    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) },
+    build := rollup.dependsOn(Compile / fullOptJS).value
   )

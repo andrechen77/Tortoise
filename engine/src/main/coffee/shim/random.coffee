@@ -1,6 +1,6 @@
 # (C) Uri Wilensky. https://github.com/NetLogo/Tortoise
 
-{ MersenneTwisterFast } = require('./engine-scala')
+{ MersenneTwisterFast } = require('engine-scala')
 
 ###
 On the JVM, we use Headless' MersenneTwisterFast.
