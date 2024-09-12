@@ -1,6 +1,6 @@
 # (C) Uri Wilensky. https://github.com/NetLogo/Tortoise
 
-parse = require('csv-parse/lib/sync')
+{ parse } = require('csv-parse/browser/esm/sync')
 
 JSType = require('util/jstype')
 
